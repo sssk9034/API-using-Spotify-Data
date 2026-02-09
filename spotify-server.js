@@ -16,22 +16,32 @@ app.get('/API-Spotify-A1/artists', async (req, res) => {
         .order('artist_name', {ascending: true});
 
     if (error) {
-        console.error(error);
+        res.send(error);
         return;
-    }
+    } 
     
     res.send(data);
 });
 
 // 2. artist by id
 app.get('/API-Spotify-A1/artists/:id', async (req, res) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id)) {
+        res.json({error: "No results found", message: `(${req.params.id}) is not a number.`});
+        return;
+    }
+
     const {data, error} = await supabase
         .from('artists')
         .select(`artist_id, artist_name, types (type_name), artist_image_url, spotify_url, spotify_desc`)
-        .eq('artist_id', req.params.id);
+        .eq('artist_id', id);
 
     if (error) {
-        console.error(error);
+        res.send(error);
+        return;
+    } else if (data.length == 0) {
+        res.json({error: "No results found", message: `There are no artists with id: (${req.params.id})`});
         return;
     }
 
@@ -42,7 +52,7 @@ app.get('/API-Spotify-A1/artists/:id', async (req, res) => {
 /*app.get('/API-Spotify-A1/artists/averages/:id', async (req, res) => {
     const {data, error} = await supabase
         .from('artists')
-        .select(`artist_id, artist_name, songs songs (bpm, energy, danceability, loudness, liveness, valence, duration, acousticness, speechiness, popularity)`)
+        .select(`artist_id, artist_name, songs (bpm, energy, danceability, loudness, liveness, valence, duration, acousticness, speechiness, popularity)`)
         .eq('artist_id', req.params.id);
 
     if (error) {
@@ -82,10 +92,6 @@ app.get('/API-Spotify-A1/artists/averages/:id', async (req, res) => {
   res.json(data[0]);
 });
 
-function getArtistAverages(id) {
-
-}
-
 // 4. get all genres
 app.get('/API-Spotify-A1/genres', async (req, res) => {
     const {data, error} = await supabase
@@ -93,7 +99,7 @@ app.get('/API-Spotify-A1/genres', async (req, res) => {
         .select('*');
     
     if (error) {
-        console.error(error);
+        res.send(error);
         return;
     }
 
@@ -109,7 +115,7 @@ app.get('/API-Spotify-A1/songs', async (req, res) => {
         .order('title', {ascending: true});
 
     if (error) {
-        console.error(error);
+        res.send(error);
         return;
     }
 
@@ -124,14 +130,24 @@ app.get('/API-Spotify-A1/songs/sort/:order', async (req, res) => {
 
 // 7. returns specific song based on song_id
 app.get('/API-Spotify-A1/songs/:id', async (req, res) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id)) {
+        res.json({error: "No results found", message: `(${req.params.id}) is not a number.`});
+        return;
+    }
+
     const {data, error} = await supabase
         .from('songs')
         .select(`song_id, title, artists (artist_id, artist_name), genres (genre_id, genre_name), 
             year, bpm, energy, danceability, loudness, valence, duration, acousticness, speechiness, popularity`)
-        .eq('song_id', req.params.id);
+        .eq('song_id', id);
 
     if (error) {
-        console.error(error);
+        res.send(error);
+        return;
+    } else if (data.length == 0) {
+        res.json({error: "No results found", message: `There are no songs with id: (${req.params.id})`});
         return;
     }
 
@@ -147,7 +163,10 @@ app.get('/API-Spotify-A1/songs/search/begin/:substring', async (req, res) => {
         .ilike('title', `${req.params.substring}%`);
 
     if (error) {
-        console.error(error);
+        res.send(error);
+        return;
+    } else if (data.length == 0) {
+        res.json({error: "No results found", message: `There are no songs beginning with (${req.params.substring})`});
         return;
     }
 
@@ -163,7 +182,10 @@ app.get('/API-Spotify-A1/songs/search/any/:substring', async (req, res) => {
         .ilike('title', `%${req.params.substring}%`);
 
     if (error) {
-        console.error(error);
+        res.send(error);
+        return;
+    } else if (data.length == 0) {
+        res.json({error: "No results found", message: `There are no songs with (${req.params.substring}) in the title`});
         return;
     }
 
@@ -172,6 +194,13 @@ app.get('/API-Spotify-A1/songs/search/any/:substring', async (req, res) => {
 
 // 10. returns songs whose year is equal to provided substring
 app.get('/API-Spotify-A1/songs/search/year/:substring', async (req, res) => {
+    const year = Number(req.params.substring);
+
+    if (!Number.isInteger(year)) {
+        res.json({error: "No results found", message: `(${req.params.substring}) is not a number.`});
+        return;
+    }
+
     const {data, error} = await supabase
         .from('songs')
         .select(`song_id, title, artists (artist_id, artist_name), genres (genre_id, genre_name), 
@@ -179,7 +208,10 @@ app.get('/API-Spotify-A1/songs/search/year/:substring', async (req, res) => {
         .eq('year', req.params.substring);
 
     if (error) {
-        console.error(error);
+        res.send(error);
+        return;
+    } else if (data.length == 0) {
+        res.json({error: "No results found", message: `There are no songs from the year (${req.params.substring})`});
         return;
     }
 
@@ -188,6 +220,13 @@ app.get('/API-Spotify-A1/songs/search/year/:substring', async (req, res) => {
 
 // 11. returns all songs for specified artist
 app.get('/API-Spotify-A1/songs/artist/:id', async (req, res) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id)) {
+        res.json({error: "No results found", message: `(${req.params.id}) is not a number.`});
+        return;
+    }
+
     const {data, error} = await supabase
         .from('songs')
         .select(`song_id, title, artists (artist_id, artist_name), genres (genre_id, genre_name), 
@@ -195,7 +234,10 @@ app.get('/API-Spotify-A1/songs/artist/:id', async (req, res) => {
         .eq('artist_id', req.params.id);
 
     if (error) {
-        console.error(error);
+        res.send(error);
+        return;
+    } else if (data.length == 0) {
+        res.json({error: "No results found", message: `There are no songs by the artist with id: (${req.params.id})`});
         return;
     }
 
@@ -204,6 +246,13 @@ app.get('/API-Spotify-A1/songs/artist/:id', async (req, res) => {
 
 // 12. returns all songs for specified genre
 app.get('/API-Spotify-A1/songs/genre/:id', async (req, res) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id)) {
+        res.json({error: "No results found", message: `(${req.params.id}) is not a number.`});
+        return;
+    }
+
     const {data, error} = await supabase
         .from('songs')
         .select(`song_id, title, artists (artist_id, artist_name), genres (genre_id, genre_name), 
@@ -211,22 +260,38 @@ app.get('/API-Spotify-A1/songs/genre/:id', async (req, res) => {
         .eq('genre_id', req.params.id);
 
     if (error) {
-        console.error(error);
+        res.send(error);
+        return;
+    } else if (data.length == 0) {
+        res.json({error: "No results found", message: `There are no songs in the genre with id: (${req.params.id})`});
         return;
     }
 
     res.send(data);
 })
 
-// 13. returns all songs for specified playlist
+// 13. returns all songs for specified playlist**
 app.get('/API-Spotify-A1/playlists/:id', async (req, res) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id)) {
+        res.json({error: "No results found", message: `(${req.params.id}) is not a number.`});
+        return;
+    } else if (!req.params.id) {
+        res.json({error: "No results found", message: `No playlist id was provided.`});
+        return;
+    }
+
     const {data, error} = await supabase
         .from('playlists')
         .select(`playlist_id, songs (song_id, title, year, artists (artist_name), genres (genre_name))`)
         .eq('playlist_id', req.params.id);
 
     if (error) {
-        console.error(error);
+        res.send(error);
+        return;
+    } else if (data.length == 0) {
+        res.json({error: "No results found", message: `There are no playlists with the id: (${req.params.id})`});
         return;
     }
 
@@ -235,8 +300,12 @@ app.get('/API-Spotify-A1/playlists/:id', async (req, res) => {
 
 // 14. returns top number (determined by parameter) of songs sorted by danceability in descending order
 app.get('/API-Spotify-A1/mood/dancing/:num', async (req, res) => {
-    let num = req.params.num;
-    if (!num || num < 1 || num > 20) {
+    let num = Number(req.params.num);
+
+    if (!Number.isInteger(num)) {
+        res.json({error: "No results found", message: `(${req.params.num}) is not a number.`});
+        return;
+    } else if (!num || num < 1 || num > 20) {
         num = 20;
     }
 
@@ -248,17 +317,21 @@ app.get('/API-Spotify-A1/mood/dancing/:num', async (req, res) => {
         .order('danceability', {ascending: false});
 
     if (error) {
-        console.error(error);
+        res.send(error);
         return;
     }
 
     res.send(data);
 })
 
-// 15. returns top number of songs sorted by valence in descending order
+// 15. returns top number of songs sorted by valence in descending order**
 app.get('/API-Spotify-A1/mood/happy/:num', async (req, res) => {
-    let num = req.params.num;
-    if (!num || num < 1 || num > 20) {
+    let num = Number(req.params.num);
+
+    if (!Number.isInteger(num)) {
+        res.json({error: "No results found", message: `(${req.params.num}) is not a number.`});
+        return;
+    } else if (!num || num < 1 || num > 20) {
         num = 20;
     }
 
@@ -270,7 +343,7 @@ app.get('/API-Spotify-A1/mood/happy/:num', async (req, res) => {
         .order('valence', {ascending: false});
 
     if (error) {
-        console.error(error);
+        res.send(error);
         return;
     }
 
@@ -279,8 +352,12 @@ app.get('/API-Spotify-A1/mood/happy/:num', async (req, res) => {
 
 // 16. returns top number of songs sorted by liveliness divided by acousticness in descending order
 app.get('/API-Spotify-A1/mood/coffee/:num', async (req, res) => {
-    let num = req.params.num;
-    if (!num || num < 1 || num > 20) {
+    let num = Number(req.params.num);
+
+    if (!Number.isInteger(num)) {
+        res.json({error: "No results found", message: `(${req.params.num}) is not a number.`});
+        return;
+    } else if (!num || num < 1 || num > 20) {
         num = 20;
     }
 
@@ -292,7 +369,33 @@ app.get('/API-Spotify-A1/mood/coffee/:num', async (req, res) => {
         .order('coffeeCalc', {ascending: false});
 
     if (error) {
-        console.error(error);
+        res.send(error);
+        return;
+    }
+
+    res.send(data);
+})
+
+// 17. return top number of songs sorted by product of the energy and speechiness parameters in ascending order
+app.get('/API-Spotify-A1/mood/studying/:num', async (req, res) => {
+    let num = Number(req.params.num);
+
+    if (!Number.isInteger(num)) {
+        res.json({error: "No results found", message: `(${req.params.num}) is not a number.`});
+        return;
+    } else if (!num || num < 1 || num > 20) {
+        num = 20;
+    }
+
+    const {data, error} = await supabase
+        .from('tableWithMath')
+        .select(`song_id, title, artists (artist_id, artist_name), genres (genre_id, genre_name), 
+            year, bpm, energy, danceability, loudness, valence, duration, acousticness, speechiness, popularity`)
+        .limit(num)
+        .order('coffeeCalc', {ascending: false});
+
+    if (error) {
+        res.send(error);
         return;
     }
 
@@ -307,9 +410,9 @@ app.listen(8080, () => {
     console.log('http://localhost:8080/API-Spotify-A1/artists/averages/129');
     console.log('http://localhost:8080/API-Spotify-A1/genres');
     console.log('http://localhost:8080/API-Spotify-A1/songs');
-    console.log('http://localhost:8080/API-Spotify-A1/songs/artist');
-    console.log('http://localhost:8080/API-Spotify-A1/songs/year');
-    console.log('http://localhost:8080/API-Spotify-A1/duration');
+    console.log('http://localhost:8080/API-Spotify-A1/songs/sort/artist');
+    console.log('http://localhost:8080/API-Spotify-A1/songs/sort/year');
+    console.log('http://localhost:8080/API-Spotify-A1/songs/sort/duration');
     console.log('http://localhost:8080/API-Spotify-A1/songs/1010');
     console.log('http://localhost:8080/API-Spotify-A1/songs/sjdkfhsdkjf');
     console.log('http://localhost:8080/API-Spotify-A1/songs/search/begin/love');
@@ -325,8 +428,9 @@ app.listen(8080, () => {
     console.log('http://localhost:8080/API-Spotify-A1/playlists/35362');
     console.log('http://localhost:8080/API-Spotify-A1/mood/dancing/5');
     console.log('http://localhost:8080/API-Spotify-A1/mood/dancing/500');
-    console.log('http://localhost:8080/API-Spotify-A1/mood/dancing/5ksdjf');
+    console.log('http://localhost:8080/API-Spotify-A1/mood/dancing/ksdjf');
     console.log('http://localhost:8080/API-Spotify-A1/mood/happy/8');
     console.log('http://localhost:8080/API-Spotify-A1/mood/happy');
     console.log('http://localhost:8080/API-Spotify-A1/mood/coffee/10');
+    console.log('http://localhost:8080/API-Spotify-A1/mood/studying/15');
 });
