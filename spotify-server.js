@@ -49,48 +49,31 @@ app.get('/API-Spotify-A1/artists/:id', async (req, res) => {
 })
 
 // 3. artist averages by id
-/*app.get('/API-Spotify-A1/artists/averages/:id', async (req, res) => {
-    const {data, error} = await supabase
-        .from('artists')
-        .select(`artist_id, artist_name, songs (bpm, energy, danceability, loudness, liveness, valence, duration, acousticness, speechiness, popularity)`)
-        .eq('artist_id', req.params.id);
+app.get('/API-Spotify-A1/artists/averages/:id', async (req, res) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id)) {
+        res.json({error: "No results found", message: `(${req.params.id}) is not a number.`});
+        return;
+    }
+
+    // I did A LOT of searching and trial and error to get the rpc function to work...
+    const { data, error } = await supabase
+        .rpc('get_artist_averages', { id: req.params.id });
 
     if (error) {
-        console.error(error);
+        res.send(error);
         return;
     }
 
-    const artist = data[0];
-    if (!artist) {
-        console.error(error);
-        return;
-    }
-
-    const songFields = ['bpm','energy','danceability','loudness','liveness','valence','duration','acousticness','speechiness','popularity'];
-    const averages = {};
-
-    songFields.forEach(field => {
-        const values = artist.songs.map(song[field]);
-        const sum = values.reduce((acc, val) => acc + val, 0);
-        averages['avg_' + field] = values.length ? +(sum / values.length).toFixed(2) : 0;
-    });
-
-    res.send({
-        artist_id: artist.artist_id,
-        artist_name: artist.artist_name,
-        ...averages
-    });
-});*/
-
-// 3. alternate 
-app.get('/API-Spotify-A1/artists/averages/:id', async (req, res) => {
-  const { data, error } = await supabase
-    .rpc('getArtistAverages', { id: req.params.id });
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  res.json(data[0]);
+    res.send(data);
 });
+
+// 3. handling missing parameter
+app.get('/API-Spotify-A1/artists/averages', async (req, res) => {
+    res.json({error: "No results found", message: `No artist id was provided.`});
+        return;
+})
 
 // 4. get all genres
 app.get('/API-Spotify-A1/genres', async (req, res) => {
@@ -125,7 +108,20 @@ app.get('/API-Spotify-A1/songs', async (req, res) => {
 // 6. returns all the songs sorted by order field
 app.get('/API-Spotify-A1/songs/sort/:order', async (req, res) => {
     const { data, error} = await supabase
-        .rpc('getSongsByOrderField', {order : req.params.order});
+        .rpc('get_songs_sorted_by_order_field', {order_text : req.params.order});
+
+    if (error) {
+        res.send(error);
+        return;
+    }
+
+    res.send(data);
+})
+
+// 6. handling missing parameter
+app.get('/API-Spotify-A1/songs/sort', async (req, res) => {
+    res.json({error: "No results found", message: `No order field was provided.`});
+        return;
 })
 
 // 7. returns specific song based on song_id
@@ -173,6 +169,12 @@ app.get('/API-Spotify-A1/songs/search/begin/:substring', async (req, res) => {
     res.send(data);
 })
 
+// 8. handling missing parameter
+app.get('/API-Spotify-A1/songs/search/begin', async (req, res) => {
+    res.json({error: "No results found", message: `No string was provided.`});
+        return;
+})
+
 // 9. return songs whose title contains the provided substring
 app.get('/API-Spotify-A1/songs/search/any/:substring', async (req, res) => {
     const {data, error} = await supabase
@@ -190,6 +192,12 @@ app.get('/API-Spotify-A1/songs/search/any/:substring', async (req, res) => {
     }
 
     res.send(data);
+})
+
+// 9. handling missing parameter
+app.get('/API-Spotify-A1/songs/search/any', async (req, res) => {
+    res.json({error: "No results found", message: `No string was provided.`});
+        return;
 })
 
 // 10. returns songs whose year is equal to provided substring
@@ -218,6 +226,12 @@ app.get('/API-Spotify-A1/songs/search/year/:substring', async (req, res) => {
     res.send(data);
 })
 
+// 10. handling missing parameter
+app.get('/API-Spotify-A1/songs/search/year', async (req, res) => {
+    res.json({error: "No results found", message: `No string was provided.`});
+        return;
+})
+
 // 11. returns all songs for specified artist
 app.get('/API-Spotify-A1/songs/artist/:id', async (req, res) => {
     const id = Number(req.params.id);
@@ -242,6 +256,12 @@ app.get('/API-Spotify-A1/songs/artist/:id', async (req, res) => {
     }
 
     res.send(data);
+})
+
+// 11. handling missing parameter
+app.get('/API-Spotify-A1/songs/artist', async (req, res) => {
+    res.json({error: "No results found", message: `No artist id was provided.`});
+        return;
 })
 
 // 12. returns all songs for specified genre
@@ -270,17 +290,20 @@ app.get('/API-Spotify-A1/songs/genre/:id', async (req, res) => {
     res.send(data);
 })
 
-// 13. returns all songs for specified playlist**
+// 12. handling missing parameter
+app.get('/API-Spotify-A1/songs/genre', async (req, res) => {
+    res.json({error: "No results found", message: `No genre id was provided.`});
+        return;
+})
+
+// 13. returns all songs for specified playlist
 app.get('/API-Spotify-A1/playlists/:id', async (req, res) => {
     const id = Number(req.params.id);
 
     if (!Number.isInteger(id)) {
         res.json({error: "No results found", message: `(${req.params.id}) is not a number.`});
         return;
-    } else if (!req.params.id) {
-        res.json({error: "No results found", message: `No playlist id was provided.`});
-        return;
-    }
+    } 
 
     const {data, error} = await supabase
         .from('playlists')
@@ -296,6 +319,12 @@ app.get('/API-Spotify-A1/playlists/:id', async (req, res) => {
     }
 
     res.send(data);
+})
+
+// 13. handling missing parameter
+app.get('/API-Spotify-A1/playlists', async (req, res) => {
+    res.json({error: "No results found", message: `No playlist id was provided.`});
+        return;
 })
 
 // 14. returns top number (determined by parameter) of songs sorted by danceability in descending order
@@ -324,7 +353,26 @@ app.get('/API-Spotify-A1/mood/dancing/:num', async (req, res) => {
     res.send(data);
 })
 
-// 15. returns top number of songs sorted by valence in descending order**
+// 14. handling missing parameter
+app.get('/API-Spotify-A1/mood/dancing', async (req, res) => {
+    const num = 20;
+
+    const {data, error} = await supabase
+        .from('songs')
+        .select(`song_id, title, artists (artist_id, artist_name), genres (genre_id, genre_name), 
+            year, bpm, energy, danceability, loudness, valence, duration, acousticness, speechiness, popularity`)
+        .limit(num)
+        .order('danceability', {ascending: false});
+
+    if (error) {
+        res.send(error);
+        return;
+    }
+
+    res.send(data);
+})
+
+// 15. returns top number of songs sorted by valence in descending order
 app.get('/API-Spotify-A1/mood/happy/:num', async (req, res) => {
     let num = Number(req.params.num);
 
@@ -334,6 +382,25 @@ app.get('/API-Spotify-A1/mood/happy/:num', async (req, res) => {
     } else if (!num || num < 1 || num > 20) {
         num = 20;
     }
+
+    const {data, error} = await supabase
+        .from('songs')
+        .select(`song_id, title, artists (artist_id, artist_name), genres (genre_id, genre_name), 
+            year, bpm, energy, danceability, loudness, valence, duration, acousticness, speechiness, popularity`)
+        .limit(num)
+        .order('valence', {ascending: false});
+
+    if (error) {
+        res.send(error);
+        return;
+    }
+
+    res.send(data);
+})
+
+// 15. handling missing parameter
+app.get('/API-Spotify-A1/mood/happy', async (req, res) => {
+    const num = 20;
 
     const {data, error} = await supabase
         .from('songs')
@@ -361,12 +428,24 @@ app.get('/API-Spotify-A1/mood/coffee/:num', async (req, res) => {
         num = 20;
     }
 
+    // I changed the values of acousticness (if they were zero) from 0 to 1 so the calculation didn't throw an error 
     const {data, error} = await supabase
-        .from('tableWithMath')
-        .select(`song_id, title, artists (artist_id, artist_name), genres (genre_id, genre_name), 
-            year, bpm, energy, danceability, loudness, valence, duration, acousticness, speechiness, popularity`)
-        .limit(num)
-        .order('coffeeCalc', {ascending: false});
+        .rpc('coffee_calc', {num : num});
+
+    if (error) {
+        res.send(error);
+        return;
+    }
+
+    res.send(data);
+})
+
+// 16. handling missing parameter
+app.get('/API-Spotify-A1/mood/coffee', async (req, res) => {
+    const num = 20;
+
+    const {data, error} = await supabase
+        .rpc('coffee_calc', {num : num});
 
     if (error) {
         res.send(error);
@@ -388,11 +467,22 @@ app.get('/API-Spotify-A1/mood/studying/:num', async (req, res) => {
     }
 
     const {data, error} = await supabase
-        .from('tableWithMath')
-        .select(`song_id, title, artists (artist_id, artist_name), genres (genre_id, genre_name), 
-            year, bpm, energy, danceability, loudness, valence, duration, acousticness, speechiness, popularity`)
-        .limit(num)
-        .order('coffeeCalc', {ascending: false});
+        .rpc('study_calc', {num : num});
+
+    if (error) {
+        res.send(error);
+        return;
+    }
+
+    res.send(data);
+})
+
+// 17. handling missing parameter
+app.get('/API-Spotify-A1/mood/studying', async (req, res) => {
+    const num = 20;
+
+    const {data, error} = await supabase
+        .rpc('study_calc', {num : num});
 
     if (error) {
         res.send(error);
