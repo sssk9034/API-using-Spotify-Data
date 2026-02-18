@@ -1,6 +1,6 @@
 {
     "version": 2,
-    "builds" [{ "src": "spotify-server.js", "use": "@vercel/node"}],
+    "builds": [{ "src": "spotify-server.js", "use": "@vercel/node"}],
     "routes": [
         {
             "src": "/(.*)",
