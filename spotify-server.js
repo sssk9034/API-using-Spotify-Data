@@ -16,11 +16,11 @@ app.get('/API-Spotify-A1/artists', async (req, res) => {
         .order('artist_name', {ascending: true});
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     } 
     
-    res.send(data);
+    res.json(data);
 });
 
 // 2. artist by id
@@ -38,14 +38,14 @@ app.get('/API-Spotify-A1/artists/:id', async (req, res) => {
         .eq('artist_id', id);
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     } else if (data.length == 0) {
         res.json({error: "No results found", message: `There are no artists with id: (${req.params.id})`});
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 3. artist averages by id
@@ -62,11 +62,11 @@ app.get('/API-Spotify-A1/artists/averages/:id', async (req, res) => {
         .rpc('get_artist_averages', { id: req.params.id });
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     }
 
-    res.send(data);
+    res.json(data);
 });
 
 // 3. handling missing parameter
@@ -82,11 +82,11 @@ app.get('/API-Spotify-A1/genres', async (req, res) => {
         .select('*');
     
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 5. returns all songs sorted by title
@@ -98,11 +98,11 @@ app.get('/API-Spotify-A1/songs', async (req, res) => {
         .order('title', {ascending: true});
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 6. returns all the songs sorted by order field
@@ -111,11 +111,11 @@ app.get('/API-Spotify-A1/songs/sort/:order', async (req, res) => {
         .rpc('get_songs_sorted_by_order_field', {order_text : req.params.order});
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 6. handling missing parameter
@@ -140,14 +140,14 @@ app.get('/API-Spotify-A1/songs/:id', async (req, res) => {
         .eq('song_id', id);
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     } else if (data.length == 0) {
         res.json({error: "No results found", message: `There are no songs with id: (${req.params.id})`});
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 8. return song whose title begins with provided substring
@@ -159,14 +159,14 @@ app.get('/API-Spotify-A1/songs/search/begin/:substring', async (req, res) => {
         .ilike('title', `${req.params.substring}%`);
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     } else if (data.length == 0) {
         res.json({error: "No results found", message: `There are no songs beginning with (${req.params.substring})`});
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 8. handling missing parameter
@@ -184,14 +184,14 @@ app.get('/API-Spotify-A1/songs/search/any/:substring', async (req, res) => {
         .ilike('title', `%${req.params.substring}%`);
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     } else if (data.length == 0) {
         res.json({error: "No results found", message: `There are no songs with (${req.params.substring}) in the title`});
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 9. handling missing parameter
@@ -216,14 +216,14 @@ app.get('/API-Spotify-A1/songs/search/year/:substring', async (req, res) => {
         .eq('year', req.params.substring);
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     } else if (data.length == 0) {
         res.json({error: "No results found", message: `There are no songs from the year (${req.params.substring})`});
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 10. handling missing parameter
@@ -248,14 +248,14 @@ app.get('/API-Spotify-A1/songs/artist/:id', async (req, res) => {
         .eq('artist_id', req.params.id);
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     } else if (data.length == 0) {
         res.json({error: "No results found", message: `There are no songs by the artist with id: (${req.params.id})`});
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 11. handling missing parameter
@@ -280,14 +280,14 @@ app.get('/API-Spotify-A1/songs/genre/:id', async (req, res) => {
         .eq('genre_id', req.params.id);
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     } else if (data.length == 0) {
         res.json({error: "No results found", message: `There are no songs in the genre with id: (${req.params.id})`});
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 12. handling missing parameter
@@ -311,14 +311,14 @@ app.get('/API-Spotify-A1/playlists/:id', async (req, res) => {
         .eq('playlist_id', req.params.id);
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     } else if (data.length == 0) {
         res.json({error: "No results found", message: `There are no playlists with the id: (${req.params.id})`});
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 13. handling missing parameter
@@ -346,11 +346,11 @@ app.get('/API-Spotify-A1/mood/dancing/:num', async (req, res) => {
         .order('danceability', {ascending: false});
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 14. handling missing parameter
@@ -365,11 +365,11 @@ app.get('/API-Spotify-A1/mood/dancing', async (req, res) => {
         .order('danceability', {ascending: false});
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 15. returns top number of songs sorted by valence in descending order
@@ -391,11 +391,11 @@ app.get('/API-Spotify-A1/mood/happy/:num', async (req, res) => {
         .order('valence', {ascending: false});
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 15. handling missing parameter
@@ -410,11 +410,11 @@ app.get('/API-Spotify-A1/mood/happy', async (req, res) => {
         .order('valence', {ascending: false});
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 16. returns top number of songs sorted by liveliness divided by acousticness in descending order
@@ -433,11 +433,11 @@ app.get('/API-Spotify-A1/mood/coffee/:num', async (req, res) => {
         .rpc('coffee_calc', {num : num});
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 16. handling missing parameter
@@ -448,11 +448,11 @@ app.get('/API-Spotify-A1/mood/coffee', async (req, res) => {
         .rpc('coffee_calc', {num : num});
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 17. return top number of songs sorted by product of the energy and speechiness parameters in ascending order
@@ -470,11 +470,11 @@ app.get('/API-Spotify-A1/mood/studying/:num', async (req, res) => {
         .rpc('study_calc', {num : num});
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 // 17. handling missing parameter
@@ -485,11 +485,11 @@ app.get('/API-Spotify-A1/mood/studying', async (req, res) => {
         .rpc('study_calc', {num : num});
 
     if (error) {
-        res.send(error);
+        res.json(error);
         return;
     }
 
-    res.send(data);
+    res.json(data);
 })
 
 app.listen(8080, () => {
