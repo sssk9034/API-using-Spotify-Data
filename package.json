@@ -1,0 +1,25 @@
+{
+  "name": "api-using-spotify-data",
+  "version": "1.0.0",
+  "description": "Creation of API using Node, as well as provisioning a database on Supabase",
+  "homepage": "https://github.com/sssk9034/API-using-Spotify-Data#readme",
+  "bugs": {
+    "url": "https://github.com/sssk9034/API-using-Spotify-Data/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sssk9034/API-using-Spotify-Data.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "spotify-server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node spotify-server"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.93.3",
+    "express": "^5.2.1"
+  }
+}

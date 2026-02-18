@@ -11,10 +11,10 @@ Supabase is used to provide practical experience with a cloud DBMS and to simpli
 |--------|-------------|--------|
 | `/api/artists` | Returns all artists sorted by `artist_name`. Includes `types (type_name)` instead of artist_type foreign keys. | ✅ |
 | `/api/artists/:id` | Returns a specific artist using `artist_id` (e.g., `/api/artists/129`). | ✅ |
-| `/api/artists/averages/:id` | Returns average values for bpm, energy, danceability, loudness, liveness, valence, duration, acousticness, speechiness, and popularity for a specific artist. | ❌ |
+| `/api/artists/averages/:id` | Returns average values for bpm, energy, danceability, loudness, liveness, valence, duration, acousticness, speechiness, and popularity for a specific artist. | ✅ |
 | `/api/genres` | Returns all genres. | ✅ |
 | `/api/songs` | Returns all songs sorted by title. Includes artist (`artist_id`, `artist_name`) and genre (`genre_id`, `genre_name`) instead of foreign keys. | ✅ |
-| `/api/songs/sort/:order` | Returns songs sorted by the specified field: `id`, `title`, `artist`, `genre`, `year`, or `duration`. | ❌ |
+| `/api/songs/sort/:order` | Returns songs sorted by the specified field: `id`, `title`, `artist`, `genre`, `year`, or `duration`. | ✅ |
 | `/api/songs/:id` | Returns a specific song using `song_id` (e.g., `/api/songs/1028`). | ✅ |
 | `/api/songs/search/begin/:substring` | Returns songs whose titles begin with the provided substring (case-insensitive). | ✅ |
 | `/api/songs/search/any/:substring` | Returns songs whose titles contain the provided substring (case-insensitive). | ✅ |
@@ -24,8 +24,8 @@ Supabase is used to provide practical experience with a cloud DBMS and to simpli
 | `/api/playlists/:id` | Returns all songs for a specified playlist. Includes playlist, song_id, title, artist name, genre name, and year. | ✅ |
 | `/api/mood/dancing/:n` | Returns top `n` songs sorted by danceability (desc). Defaults to 20 if `n` is invalid. | ✅ |
 | `/api/mood/happy/:n` | Returns top `n` songs sorted by valence (desc). Defaults to 20 if `n` is invalid. | ✅ |
-| `/api/mood/coffee/:n` | Returns top `n` songs sorted by liveness ÷ acousticness (desc). Defaults to 20 if `n` is invalid. | ❌ |
-| `/api/mood/studying/:n` | Returns top `n` songs sorted by energy × speechiness (asc). Defaults to 20 if `n` is invalid. | ❌ |
+| `/api/mood/coffee/:n` | Returns top `n` songs sorted by liveness ÷ acousticness (desc). Defaults to 20 if `n` is invalid. | ✅ |
+| `/api/mood/studying/:n` | Returns top `n` songs sorted by energy × speechiness (asc). Defaults to 20 if `n` is invalid. | ✅ |
 ###### I took the checking system idea from Matthew with permission
 
 
